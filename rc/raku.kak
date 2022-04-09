@@ -1,7 +1,8 @@
 # https://raku.org/
  
 # Detection
-hook global BufCreate .*\.(t|p6|raku|rakumod)$ %{
+# TODO: .t files are perl and raku; how to disambiguate?
+hook global BufCreate .*\.(p6|raku|rakumod)$ %{
     set-option buffer filetype raku
 }
 
@@ -55,6 +56,7 @@ add-highlighter shared/raku/pod            region ^=\w+  ^=cut\b                
 
 evaluate-commands %sh{
     # Grammar
+    # TODO: remove the ones that are Perl5-only 
     keywords="else lock qw elsif lt qx eq exp ne sub multi for no my not tr goto and foreach or break exit unless cmp ge package until continue gt while if qq xor do le qr return"
     attributes="END AUTOLOAD BEGIN CHECK UNITCHECK INIT DESTROY
                 length setpgrp endgrent link setpriority endhostent listen setprotoent endnetent local setpwent
