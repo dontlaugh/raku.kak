@@ -23,15 +23,20 @@ hook global WinSetOption filetype=raku %{
 }
 
 hook -group raku-highlight global WinSetOption filetype=raku %{
+    #               <path>/<name>  (window scope, raku is name of highlighter)
     add-highlighter window/raku ref raku
     hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/raku }
 }
 
+
 provide-module raku %§
 
-# Highlighters
+# add-highlighter <scope/path>/<name> <type> <params> ...
+# valid scopes: global, buffer, window, shared
 
+# ref (used above) calls this shared 'raku' region
 add-highlighter shared/raku regions
+               #<path>/<name>/<region_name>
 add-highlighter shared/raku/code default-region group
 add-highlighter shared/raku/command        region (?<!\$)(?<!\\)`   (?<!\\)(\\\\)*` fill meta
 add-highlighter shared/raku/double_string  region (?<!\$)"          (?<!\\)(\\\\)*" fill string
@@ -57,7 +62,7 @@ add-highlighter shared/raku/pod            region ^=\w+  ^=cut\b                
 evaluate-commands %sh{
     # Grammar
     # TODO: remove the ones that are Perl5-only 
-    keywords="else lock qw elsif lt qx eq exp ne sub multi for no my not tr goto and foreach or break exit unless cmp ge package until continue gt while if qq xor do le qr return"
+    keywords="else lock qw elsif lt grammar qx eq exp ne sub multi for no my not tr goto and foreach or break exit unless cmp ge package until continue gt while if qq xor do le qr return"
     attributes="END AUTOLOAD BEGIN CHECK UNITCHECK INIT DESTROY
                 length setpgrp endgrent link setpriority endhostent listen setprotoent endnetent local setpwent
                 endprotoent localtime setservent endpwent log setsockopt endservent lstat shift eof map shmctl eval mkdir shmget exec msgctl shmread
@@ -84,6 +89,11 @@ evaluate-commands %sh{
         add-highlighter shared/raku/code/ regex \b($(join "${values}" '|'))\b 0:value
     "
 }
+
+#
+# because we did this above:
+# add-highlighter shared/raku/code default-region group
+# We now add these regex highlighters to our default region
 
 add-highlighter shared/raku/code/ regex (?!\$)-?([0-9]*\.(?!0[xXbB]))?\b([0-9]+|0[xX][0-9a-fA-F]+|0[bb][01_]+)\.?([eE][+-]?[0-9]+)?i?\b 0:value
 add-highlighter shared/raku/code/ regex %{\$!|\$"|\$#|\$\$|\$%|\$&|\$'|\$\(|\$\)|\$\*|\$\+|\$,|\$_|\$-|\$`|\$\.|\$/|\$:|\$;|\$<|\$=|\$>|\$\?|\$@|\$\[|\$\\|\$\]|\$\^|\$\||\$~|%!|@\+|@-|@_} 0:value
